@@ -1,25 +1,57 @@
 pipeline {
     agent any
+    tools {
+        maven 'm1'
+    }
     stages {
-        stage('Build') {
+        stage("checkout") {
             steps {
-                sh 'mvn -f hello-app/pom.xml -B -DskipTests clean package'
-            }
-            post {
-                success {
-                    echo "Now Archiving the Artifacts....."
-                    archiveArtifacts artifacts: '**/*.jar'
-                }
+                git branch: 'main', url: 'https://github.com/Jaspreet1601/pipelines.git'
             }
         }
-        stage('Test') {
+        stage("clean") {
             steps {
-                sh 'mvn -f hello-app/pom.xml test'
+                bat 'mvn clean'
             }
-            post {
-                always {
-                    junit 'hello-app/target/surefire-reports/*.xml'
-                }
+        }
+        stage("validate") {
+            steps {
+                bat 'mvn validate'
+            }
+        }
+        stage("compile") {
+            steps {
+                bat 'mvn compile'
+            }
+        }
+        stage("test") {
+            steps {
+                bat 'mvn test'
+            }
+        }
+        stage("package") {
+            steps {
+                bat 'mvn package'
+            }
+        }
+        stage("integration-test") {
+            steps {
+                bat 'mvn integration-test'
+            }
+        }
+        stage("verify") {
+            steps {
+                bat 'mvn verify'
+            }
+        }
+        stage("install") {
+            steps {
+                bat 'mvn install'
+            }
+        }
+        stage("deploy") {
+            steps {
+                bat 'mvn deploy:deploy-file' // Corrected the deploy command
             }
         }
     }
